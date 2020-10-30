@@ -11,7 +11,6 @@ class HashTableEntry:
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
-
 class HashTable:
     """
     A hash table that with `capacity` buckets
@@ -22,6 +21,10 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        if capacity>= MIN_CAPACITY:
+            self.capacity = capacity
+            self.mylist = [None]* self.capacity
+            
 
 
     def get_num_slots(self):
@@ -35,7 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return len(self.mylist)
 
     def get_load_factor(self):
         """
@@ -44,6 +47,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        sum = 0
+        for x in self.mylist:
+            sum = sum + x
+        return sum % self.get_num_slots
 
 
     def fnv1(self, key):
@@ -63,14 +70,17 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-
+        hash = 5381
+        for character in key:
+            hash = ((hash<<5)+hash)+ord(character)
+        return hash & 0xFFFFFFFF 
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+  
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -82,6 +92,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        self.mylist[self.hash_index(key)]= value
+
 
 
     def delete(self, key):
@@ -93,8 +105,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
-
+        self.put(key, None)
+    
     def get(self, key):
         """
         Retrieve the value stored with the given key.
@@ -104,7 +116,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return self.mylist[self.hash_index(key)]
+        
 
     def resize(self, new_capacity):
         """
