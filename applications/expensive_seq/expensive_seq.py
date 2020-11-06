@@ -1,10 +1,15 @@
 # Your code here
 
-
+cache = {}
 def expensive_seq(x, y, z):
     # Your code here
-
-
+    inputs = (x, y, z)
+    if inputs  not in cache:
+        if x<= 0:
+            cache[inputs] = y + z
+        else:
+            cache[inputs]= expensive_seq(x-1,y+1,z) + expensive_seq(x-2,y+2,z*2) + expensive_seq(x-3,y+3,z*3)
+    return cache[inputs]
 
 if __name__ == "__main__":
     for i in range(10):

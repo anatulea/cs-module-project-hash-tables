@@ -47,11 +47,11 @@ dict_list = list(my_dict.items())
 
 dict_list.sort(reverse=True)
 
-print(dict_list)
+print(dict_list) #[('qux', 'bar'), ('f00', 'izzy'), ('a', '1')]
 
 # print in ascending order, sorted by value
 dict_list.sort(key=lambda tuple_pair: tuple_pair[1])
-print(dict_list)
+print(dict_list) #[('a', '1'), ('qux', 'bar'), ('f00', 'izzy')]
 
 """
 [('a', 1), ('f00', 'bar'), ('qux', 'izzy')]
@@ -157,9 +157,9 @@ def build_index(records):
 
 indexed_records = build_index(records)
 
-print(indexed_records['DS'])
-print(indexed_records['Web'])
-print(indexed_records['iOS'])
+print(indexed_records['DS']) #['Cai', 'Chris']
+print(indexed_records['Web']) #['Tara', 'Kyle', 'Adrian', 'Janessa', 'Mike']
+print(indexed_records['iOS'])#['Craig']
 
 
 
@@ -218,7 +218,7 @@ def encode(old_string):
     return new_string
 
 herrow = encode(first_string)
-print(herrow)
+print(herrow) # DOGGE
 
 # make a decode table so we can also decode our super secret messages
 # with encode table, keys --> values, values --> keys
@@ -239,7 +239,7 @@ def decode(old_string):
     return new_string
 
 decoded = decode(herrow)
-print(decoded)
+print(decoded) #HELLO
 
 
 
