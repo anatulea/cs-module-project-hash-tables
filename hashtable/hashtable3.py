@@ -1,23 +1,28 @@
+from linked_list import LinkedList
+import sys
+sys.path.append('../hashtable/linked_list')
+
 class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
-
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
 
 
+
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
+MAX_LOAD_FACTOR = 0.7   
+MIN_LOAD_FACTOR = 0.2
 
 
 class HashTable:
     """
     A hash table that with `capacity` buckets
     that accepts string keys
-
     Implement this.
     """
 
@@ -25,41 +30,41 @@ class HashTable:
         # Your code here
         if capacity >= MIN_CAPACITY:
             self.capacity = max(capacity, MIN_CAPACITY)
-            self.mylist = [None] * self.capacity
+            self.mylist = [LinkedList()] * self.capacity
+            self.load = 0
+        
 
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
         table data. (Not the number of items stored in the hash table,
         but the number of slots in the main list.)
-
         One of the tests relies on this.
-
         Implement this.
         """
         # Your code here
-        return len(self.mylist)
+        return self.capacity
+
 
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
-
         Implement this.
         """
         # Your code here
-        sum = 0
-        for x in self.mylist:
-            sum = sum + x
-        return sum % self.get_num_slots
+        return self.load / self.capacity
+
 
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
-
         Implement this, and/or DJB2.
         """
 
-        # Your code here
+        """
+        Returns: The FNV-1a (alternate) hash of a given string
+        """
+
         FNV_offset_basis = 14695981039346656037
         FNV_prime = 1099511628211
 
@@ -75,7 +80,6 @@ class HashTable:
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
-
         Implement this, and/or FNV-1.
         """
         # Your code here
@@ -84,57 +88,102 @@ class HashTable:
             hash = ((hash << 5)+hash)+ord(character)
         return hash & 0xFFFFFFFF
 
+
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
-        between within the storage capacity of the hash table.
+        between within the mylist capacity of the hash table.
         """
-
+        # returns an index value for a key
+        # return self.fnv1(key) % len(self.mylist)
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
         Store the value with the given key.
-
         Hash collisions should be handled with Linked List Chaining.
-
         Implement this.
         """
         # Your code here
-        slot = self.hash_index(key)
-        self.mylist[slot] = value
+        # stores value in a particular slot
+        slot = self.hash_index(key)        
+        current = self.mylist[slot].head
+
+        while current:
+            # search for the slot with the specifiv key
+            if current.key == key:
+                # if found update the value
+                current.value = value
+            # move to the next slot  
+            current = current.next
+        # if there is no slot with the specifik key we create a hashtabel entry
+        entry = HashTableEntry(key, value)
+        # we insert the entry at the head of our linked list
+        self.mylist[slot].insert_at_head(entry)
+        self.load += 1
+
+
 
     def delete(self, key):
         """
         Remove the value stored with the given key.
-
         Print a warning if the key is not found.
-
         Implement this.
         """
         # Your code here
+        # we use the put method and instead of adding the value we add None 
         self.put(key, None)
+        self.load -=1 
+
 
     def get(self, key):
         """
         Retrieve the value stored with the given key.
-
         Returns None if the key is not found.
-
         Implement this.
         """
         # Your code here
-        return self.mylist[self.hash_index(key)]
+        # get the slot 
+        slot = self.hash_index(key)
+        # use the slot as index to find the linked list head
+        current = self.mylist[slot].head
+        
+        while current: # while the LL head is not none
+            # if the LL head's key is equal withhthe key that we are searching
+            if current.key == key: 
+                # we return the value 
+                return current.value
+            # move to the next slot until we find it
+            current = current.next
+        # we return non if there is no node in the LL with that key we are searching for
+        return None
+
 
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
-
         Implement this.
         """
         # Your code here
+    
+        old_mylist = self.mylist
+        # make a newlist with the new capacity
+        self.mylist = [LinkedList()] * new_capacity
 
+
+        # if the present load factor is equal or bigger that 0.7
+        if self.get_load_factor() >= MAX_LOAD_FACTOR:
+            # iterate over the old list
+            for item in old_mylist:
+                current = item.head
+                while current:
+                    # move all the old kv to the new list
+                    self.put(current.key, current.value)
+                    current = current.next
+            # set the capacity to the new capacity
+            self.capacity = new_capacity
+        
 
 if __name__ == "__main__":
     ht = HashTable(8)
